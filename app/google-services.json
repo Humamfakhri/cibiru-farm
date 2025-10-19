@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "510357149426",
+    "firebase_url": "https://iotcibiruwetan-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "iotcibiruwetan",
+    "storage_bucket": "iotcibiruwetan.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:510357149426:android:70c9a1fc941b6e90cda26b",
+        "android_client_info": {
+          "package_name": "org.khiot.iotcibiruwetan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv6-Oe2Et1fTX89UE632QFIcEoWs3dLFo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
