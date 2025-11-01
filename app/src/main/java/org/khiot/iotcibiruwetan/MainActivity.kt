@@ -1,14 +1,18 @@
 package org.khiot.iotcibiruwetan
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import org.khiot.iotcibiruwetan.navigation.MainScreen
 import org.khiot.iotcibiruwetan.ui.theme.MyAppTheme
@@ -57,18 +61,33 @@ import org.khiot.iotcibiruwetan.ui.theme.MyAppTheme
 //}
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Aktifkan edge-to-edge dan atur status bar jadi putih dengan ikon gelap
+//        enableEdgeToEdge(
+//            statusBarStyle = SystemBarStyle.light(
+//                android.graphics.Color.TRANSPARENT,  // warna status bar
+//                android.graphics.Color.BLACK   // warna ikon (darkIcons)
+//            ),
+//            navigationBarStyle = SystemBarStyle.light(
+//                android.graphics.Color.WHITE,
+//                android.graphics.Color.BLACK
+//            )
+//        )
+
+        // Atur warna status bar & navigation bar di sini
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
-                android.graphics.Color.TRANSPARENT,  // warna status bar
-                android.graphics.Color.BLACK   // warna ikon (darkIcons)
+                scrim = Color(0xFFFFFFFF).toArgb(),
+//                scrim = Color(0xFF0EB1D2).toArgb(),
+                darkScrim = Color(0xFFFFFFFF).toArgb()
+//                darkScrim = Color(0xFF0EB1D2).toArgb()
             ),
             navigationBarStyle = SystemBarStyle.light(
-                android.graphics.Color.WHITE,
-                android.graphics.Color.BLACK
+                scrim = Color(0xFFFFFFFF).toArgb(),
+                darkScrim = Color(0xFFFFFFFF).toArgb()
             )
         )
 

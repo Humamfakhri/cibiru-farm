@@ -17,34 +17,38 @@ val PlusJakartaSans = FontFamily(
     Font(R.font.plus_jakarta_sans_bold, FontWeight.Bold)
 )
 
-val textColor = Color(android.graphics.Color.parseColor("#2B4141"))
+val textColor = Color(0xFF6B7280)
 
 // ✅ Apply font ke Typography
 val AppTypography = Typography(
     bodyLarge = androidx.compose.ui.text.TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Normal,
+        color = textColor,
         fontSize = 16.sp
     ),
     bodySmall = androidx.compose.ui.text.TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        color = Color(0xFF6B7280)
+        color = textColor,
+        fontSize = 14.sp
     ),
     headlineMedium = androidx.compose.ui.text.TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Bold,
+        color = textColor,
         fontSize = 20.sp
     ),
     headlineLarge = androidx.compose.ui.text.TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.ExtraBold,
+        color = textColor,
         fontSize = 24.sp
     ),
     labelLarge = androidx.compose.ui.text.TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Medium,
+        color = textColor,
         fontSize = 24.sp
     )
 )
@@ -53,7 +57,11 @@ val AppTypography = Typography(
 private val LightColors = lightColorScheme(
     primary = Color(0xFF0EB1D2),
     secondary = Color(0xFF00677A),
-    tertiary = Color(0xFF5C5C5C)
+    tertiary = Color(0xFF5C5C5C),
+    background = Color.White,
+    surface = Color.White,
+    onBackground = textColor,
+    onSurface = textColor
 )
 
 @Composable

@@ -4,7 +4,6 @@ package org.khiot.iotcibiruwetan.ui.screen.kebuncabe
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -59,18 +58,25 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Timestamp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import org.khiot.iotcibiruwetan.R
 import org.khiot.iotcibiruwetan.data.firebase.FirebaseRealtimeDatabase
+import org.khiot.iotcibiruwetan.data.model.FormattedTime
 import org.khiot.iotcibiruwetan.data.model.KebunCabeData
 import org.khiot.iotcibiruwetan.data.model.Soil
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 data class WateringSchedule(
     val id: Int,
@@ -87,6 +93,8 @@ fun KebunCabeScreen() {
     var valve2Enabled by remember { mutableStateOf(false) }
     var soil1 by remember { mutableStateOf(Soil()) }
     var soil2 by remember { mutableStateOf(Soil()) }
+    var timestamp by remember { mutableStateOf(Timestamp.now().toString()) }
+    val formatted = formatTimestampToLocalFriendly(timestamp)
     fun getValveImage(isEnabled: Boolean, soilStatus: String): Int {
         return if (isEnabled) {
             when (soilStatus) {
@@ -120,9 +128,9 @@ fun KebunCabeScreen() {
     LaunchedEffect(Unit) {
         FirebaseRealtimeDatabase.getKebunCabeData(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d("FIREBASE", "${snapshot.value}")
+//                Log.d("FIREBASE", "${snapshot.value}")
                 snapshot.getValue(KebunCabeData::class.java)?.let {
-                    Log.d("FIREBASE", "$it")
+//                    Log.d("FIREBASE", "$it")
                     kebunData = it
                 }
             }
@@ -139,6 +147,7 @@ fun KebunCabeScreen() {
         valve2Enabled = kebunData.valveOpen2
         soil1 = kebunData.soil1
         soil2 = kebunData.soil2
+        timestamp = kebunData.timestamp
     }
 
     LazyColumn(
@@ -157,15 +166,26 @@ fun KebunCabeScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Spacer(modifier = Modifier.padding(8.dp))
+//                Spacer(modifier = Modifier.padding(8.dp))
+//                Text(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    text = "Kebun Cabe",
+//                    style = MaterialTheme.typography.headlineLarge,
+//                    textAlign = TextAlign.Center,
+//                    color = MaterialTheme.colorScheme.primary
+//                )
+//                Text(
+//                    text = "Terakhir update:",
+//                    textAlign = TextAlign.Start,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
                 Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Kebun Cabe",
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary
+                    text = formatted.text,
+//                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.alpha(if (formatted.isStale) 0.5f else 1f)
                 )
-                Spacer(modifier = Modifier.padding(4.dp))
+//                Spacer(modifier = Modifier.padding(4.dp))
                 Row (
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -185,7 +205,8 @@ fun KebunCabeScreen() {
                                 .background(Color.LightGray),
 //                        contentScale = ContentScale.FillWidth
                         )
-                        Text(soil1.status, Modifier.alpha(.5f))
+                        Text(soil1.status)
+//                        Text(soil1.status, Modifier.alpha(.5f))
                     }
                     Column (
                         modifier = Modifier.weight(1f),
@@ -201,7 +222,8 @@ fun KebunCabeScreen() {
                                 .background(Color.LightGray),
 //                        contentScale = ContentScale.FillWidth
                         )
-                        Text(soil2.status, Modifier.alpha(.5f))
+                        Text(soil2.status)
+//                        Text(soil2.status, Modifier.alpha(.5f))
                     }
                 }
                 Spacer(modifier = Modifier.padding(4.dp))
@@ -664,5 +686,43 @@ fun ScheduleDialog(
                 }
             }
         )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatTimestampToLocalFriendly(timestamp: String): FormattedTime {
+    return try {
+        val instant = Instant.parse(timestamp)
+        val zoneId = ZoneId.of("Asia/Jakarta")
+        val localDateTime = instant.atZone(zoneId)
+        val now = ZonedDateTime.now(zoneId)
+
+        val duration = Duration.between(localDateTime, now)
+        val isStale = duration.toMinutes() > 30
+
+        val today = LocalDate.now(zoneId)
+        val date = localDateTime.toLocalDate()
+        val locale = Locale.Builder()
+            .setLanguage("id")
+            .setRegion("ID")
+            .build()
+
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm", locale)
+        val timeText = localDateTime.format(timeFormatter)
+
+        val formattedText = when {
+            date.isEqual(today) -> "Hari ini, $timeText"
+            date.isEqual(today.minusDays(1)) -> "Kemarin, $timeText"
+            else -> {
+                val dateFormatter = DateTimeFormatter.ofPattern("d MMMM", locale)
+                val dateText = date.format(dateFormatter)
+                "$dateText, $timeText"
+            }
+        }
+
+        FormattedTime(formattedText, isStale)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        FormattedTime("-", false)
     }
 }
