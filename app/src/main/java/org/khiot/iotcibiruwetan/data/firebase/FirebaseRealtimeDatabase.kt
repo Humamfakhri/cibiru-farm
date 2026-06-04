@@ -5,20 +5,28 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 object FirebaseRealtimeDatabase {
-    private val database: DatabaseReference =
-        FirebaseDatabase.getInstance().getReference("kebunCabe")
+    private val rootRef: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val kebunCabeRef: DatabaseReference = rootRef.child("kebunCabe")
+    private val hidroponikRef: DatabaseReference = rootRef.child("Hidroponik")
 
     fun getKebunCabeData(listener: ValueEventListener) {
-        database.addValueEventListener(listener)
+        kebunCabeRef.addValueEventListener(listener)
     }
 
+    fun getHidroponikData(listener: ValueEventListener) {
+        hidroponikRef.addValueEventListener(listener)
+    }
+
+    fun editKebunCabe(field: String, value: Any) {
+        kebunCabeRef.child(field).setValue(value)
+    }
+
+    fun editHidroponik(field: String, value: Any) {
+        hidroponikRef.child(field).setValue(value)
+    }
+
+    // Keep the old method for compatibility if needed, but update it to use kebunCabeRef
     fun editRTDB(field: String, value: Any) {
-        database.child(field).setValue(value)
-            .addOnSuccessListener {
-//                Log.d("FIREBASE", "$field updated to $value")
-            }
-            .addOnFailureListener { e ->
-//                Log.e("FIREBASE", "Failed to update $field", e)
-            }
+        kebunCabeRef.child(field).setValue(value)
     }
 }
